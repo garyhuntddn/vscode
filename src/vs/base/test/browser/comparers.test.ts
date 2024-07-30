@@ -5,7 +5,7 @@
 
 import * as assert from 'assert';
 import {
-	compareFileExtensions, compareFileExtensionsDefault, compareFileExtensionsLower, compareFileExtensionsUnicode, compareFileExtensionsUpper, compareFileNames, compareFileNamesDefault, compareFileNamesLower, compareFileNamesUnicode, compareFileNamesUpper
+	compareFileExtensions, compareFileExtensionsDefault, compareFileExtensionsLower, compareFileExtensionsUnicode, compareFileExtensionsUpper, compareFileNames, compareFileNamesDefault, compareFileNamesLower, compareFileNamesUnicode, compareFileNamesUpper, compareFileNamesJavascript, compareFileExtensionsJavascript
 } from 'vs/base/common/comparers';
 import { ensureNoDisposablesAreLeakedInTestSuite } from 'vs/base/test/common/utils';
 
@@ -695,6 +695,146 @@ suite('Comparers', () => {
 		assert(compareFileExtensionsUnicode('txt.abc01', 'txt.abc1') < 0, 'extensions with equivalent numbers sort in unicode order');
 		assert(compareFileExtensionsUnicode('a.ext1', 'b.Ext1') < 0, 'if extensions with numbers are equal except for case, unicode full filenames should be compared');
 		assert(compareFileExtensionsUnicode('a.ext1', 'a.Ext1') > 0, 'if extensions with numbers are equal except for case, unicode full filenames should be compared');
+	});
+
+	test('compareFileNamesJavascript', () => {
+
+		//
+		// Comparisons with the same results as compareFileNamesDefault
+		//
+
+		// name-only comparisons
+		assert(compareFileNamesJavascript(null, null) === 0, 'null should be equal');
+		assert(compareFileNamesJavascript(null, 'abc') < 0, 'null should be come before real values');
+		assert(compareFileNamesJavascript('', '') === 0, 'empty should be equal');
+		assert(compareFileNamesJavascript('abc', 'abc') === 0, 'equal names should be equal');
+		assert(compareFileNamesJavascript('z', 'A') > 0, 'z comes after A');
+
+		// name plus extension comparisons
+		assert(compareFileNamesJavascript('file.ext', 'file.ext') === 0, 'equal full names should be equal');
+		assert(compareFileNamesJavascript('a.ext', 'b.ext') < 0, 'if equal extensions, filenames should be compared');
+		assert(compareFileNamesJavascript('file.aaa', 'file.bbb') < 0, 'files with equal names should be compared by extensions');
+		assert(compareFileNamesJavascript('bbb.aaa', 'aaa.bbb') > 0, 'files should be compared by names even if extensions compare differently');
+
+		// dotfile comparisons
+		assert(compareFileNamesJavascript('.abc', '.abc') === 0, 'equal dotfile names should be equal');
+		assert(compareFileNamesJavascript('.env.', '.gitattributes') < 0, 'filenames starting with dots and with extensions should still sort properly');
+		assert(compareFileNamesJavascript('.env', '.aaa.env') > 0, 'dotfiles sort alphabetically when they contain multiple dots');
+		assert(compareFileNamesJavascript('.env', '.env.aaa') < 0, 'dotfiles with the same root sort shortest first');
+
+		// dotfile vs non-dotfile comparisons
+		assert(compareFileNamesJavascript(null, '.abc') < 0, 'null should come before dotfiles');
+		assert(compareFileNamesJavascript('.env', 'aaa') < 0, 'dotfiles come before filenames without extensions');
+		assert(compareFileNamesJavascript('.env', 'aaa.env') < 0, 'dotfiles come before filenames with extensions');
+		assert(compareFileNamesJavascript('.md', 'A.MD') < 0, 'dotfiles sort before uppercase files');
+		assert(compareFileNamesJavascript('.MD', 'a.md') < 0, 'dotfiles sort before lowercase files');
+
+		// numeric comparisons
+		assert(compareFileNamesJavascript('1', '1') === 0, 'numerically equal full names should be equal');
+		assert(compareFileNamesJavascript('abc1.txt', 'abc1.txt') === 0, 'equal filenames with numbers should be equal');
+		assert(compareFileNamesJavascript('abc1.txt', 'abc2.txt') < 0, 'filenames with numbers should be in numerical order, not alphabetical order');
+		assert(compareFileNamesJavascript('a.ext1', 'b.Ext1') < 0, 'if names are different and extensions with numbers are equal except for case, filenames are sorted by javascript full filename');
+		assert(compareFileNamesJavascript('a.ext1', 'a.Ext1') > 0, 'if names are equal and extensions with numbers are equal except for case, filenames are sorted by javascript full filename');
+
+		//
+		// Comparisons with different results than compareFileNamesDefault
+		//
+
+		// name-only comparisons
+		assert(compareFileNamesJavascript('Z', 'a') < 0, 'Z comes before a');
+		assert(compareFileNamesJavascript('a', 'A') > 0, 'the same letter sorts uppercase first');
+		assert(compareFileNamesJavascript('â', 'Â') > 0, 'the same accented letter sorts uppercase first');
+		assert.deepStrictEqual(['artichoke', 'Artichoke', 'art', 'Art'].sort(compareFileNamesJavascript), ['Art', 'Artichoke', 'art', 'artichoke'], 'names with the same root and different cases sort uppercase first');
+		assert.deepStrictEqual(['email', 'Email', 'émail', 'Émail'].sort(compareFileNamesJavascript), ['Email', 'email', 'Émail', 'émail'], 'the same base characters with different case or accents sort in javascript order');
+
+		// name plus extension comparisons
+		assert(compareFileNamesJavascript('aggregate.go', 'aggregate_repo.go') < 0, 'compares the whole name in javascript order, but dot comes before underscore');
+
+		// dotfile comparisons
+		assert(compareFileNamesJavascript('.aaa_env', '.aaa.env') > 0, 'an underscore in a dotfile name will sort after a dot');
+
+		// numeric comparisons
+		assert(compareFileNamesJavascript('abc2.txt', 'abc10.txt') > 0, 'filenames with numbers should be in javascript order even when they are multiple digits long');
+		assert(compareFileNamesJavascript('abc02.txt', 'abc010.txt') > 0, 'filenames with numbers that have leading zeros sort in javascript order');
+		assert(compareFileNamesJavascript('abc1.10.txt', 'abc1.2.txt') < 0, 'numbers with dots between them are sorted in javascript order');
+		assert(compareFileNamesJavascript('abc02.txt', 'abc002.txt') > 0, 'filenames with equivalent numbers and leading zeros sort in javascript order');
+		assert(compareFileNamesJavascript('abc.txt1', 'abc.txt01') > 0, 'same name plus extensions with equal numbers sort in javascript order');
+		assert(compareFileNamesJavascript('art01', 'Art01') > 0, 'a numerically equivalent name of a different case compares uppercase first');
+		assert.deepStrictEqual(['a10.txt', 'A2.txt', 'A100.txt', 'a20.txt'].sort(compareFileNamesJavascript), ['A100.txt', 'A2.txt', 'a10.txt', 'a20.txt'], 'filenames with number and case differences sort in javascript order');
+
+	});
+
+	test('compareFileExtensionsJavascript', () => {
+
+		//
+		// Comparisons with the same result as compareFileExtensionsDefault
+		//
+
+		// name-only comparisons
+		assert(compareFileExtensionsJavascript(null, null) === 0, 'null should be equal');
+		assert(compareFileExtensionsJavascript(null, 'abc') < 0, 'null should come before real files without extensions');
+		assert(compareFileExtensionsJavascript('', '') === 0, 'empty should be equal');
+		assert(compareFileExtensionsJavascript('abc', 'abc') === 0, 'equal names should be equal');
+		assert(compareFileExtensionsJavascript('z', 'A') > 0, 'z comes after A');
+
+		// name plus extension comparisons
+		assert(compareFileExtensionsJavascript('file.ext', 'file.ext') === 0, 'equal full filenames should be equal');
+		assert(compareFileExtensionsJavascript('a.ext', 'b.ext') < 0, 'if equal extensions, filenames should be compared');
+		assert(compareFileExtensionsJavascript('file.aaa', 'file.bbb') < 0, 'files with equal names should be compared by extensions');
+		assert(compareFileExtensionsJavascript('bbb.aaa', 'aaa.bbb') < 0, 'files should be compared by extension first');
+		//assert(compareFileExtensionsJavascript('a.md', 'b.MD') < 0, 'when extensions are the same except for case, the files sort by name');
+		assert(compareFileExtensionsJavascript('a.MD', 'a.md') < 0, 'case differences in extensions sort in javascript order');
+
+		// dotfile comparisons
+		assert(compareFileExtensionsJavascript('.abc', '.abc') === 0, 'equal dotfiles should be equal');
+		assert(compareFileExtensionsJavascript('.md', '.Gitattributes') > 0, 'dotfiles sort alphabetically regardless of case');
+		assert(compareFileExtensionsJavascript('.env', '.aaa.env') > 0, 'dotfiles sort alphabetically when they contain multiple dots');
+		assert(compareFileExtensionsJavascript('.env', '.env.aaa') < 0, 'dotfiles with the same root sort shortest first');
+
+		// dotfile vs non-dotfile comparisons
+		assert(compareFileExtensionsJavascript(null, '.abc') < 0, 'null should come before dotfiles');
+		assert(compareFileExtensionsJavascript('.env', 'aaa.env') < 0, 'dotfiles come before filenames with extensions');
+		assert(compareFileExtensionsJavascript('.MD', 'a.md') < 0, 'dotfiles sort before lowercase files');
+		assert(compareFileExtensionsJavascript('.env', 'aaa') < 0, 'dotfiles come before filenames without extensions');
+		assert(compareFileExtensionsJavascript('.md', 'A.MD') < 0, 'dotfiles sort before uppercase files');
+
+		// numeric comparisons
+		assert(compareFileExtensionsJavascript('1', '1') === 0, 'numerically equal full names should be equal');
+		assert(compareFileExtensionsJavascript('abc1.txt', 'abc1.txt') === 0, 'equal filenames with numbers should be equal');
+		assert(compareFileExtensionsJavascript('abc1.txt', 'abc2.txt') < 0, 'filenames with numbers should be in numerical order, not alphabetical order');
+		assert(compareFileExtensionsJavascript('txt.abc1', 'txt.abc1') === 0, 'equal extensions with numbers should be equal');
+		assert(compareFileExtensionsJavascript('txt.abc1', 'txt.abc2') < 0, 'extensions with numbers should be in numerical order, not alphabetical order');
+		assert(compareFileExtensionsJavascript('a.ext1', 'b.ext1') < 0, 'if equal extensions with numbers, full filenames should be compared');
+
+		//
+		// Comparisons with different results than compareFileExtensionsDefault
+		//
+
+		// name-only comparisons
+		assert(compareFileExtensionsJavascript('Z', 'a') < 0, 'Z comes before a');
+		assert(compareFileExtensionsJavascript('a', 'A') > 0, 'the same letter sorts uppercase first');
+		assert(compareFileExtensionsJavascript('â', 'Â') > 0, 'the same accented letter sorts uppercase first');
+		assert.deepStrictEqual(['artichoke', 'Artichoke', 'art', 'Art'].sort(compareFileExtensionsJavascript), ['Art', 'Artichoke', 'art', 'artichoke'], 'names with the same root and different cases sort uppercase names first');
+		assert.deepStrictEqual(['email', 'Email', 'émail', 'Émail'].sort(compareFileExtensionsJavascript), ['Email', 'email', 'Émail', 'émail'], 'the same base characters with different case or accents sort in javascript order');
+
+		// name plus extension comparisons
+		assert(compareFileExtensionsJavascript('a.MD', 'a.md') < 0, 'case differences in extensions sort by uppercase extension first');
+		assert(compareFileExtensionsJavascript('a.md', 'A.md') > 0, 'case differences in names sort uppercase first');
+		assert(compareFileExtensionsJavascript('art01', 'Art01') > 0, 'a numerically equivalent name of a different case sorts uppercase first');
+		assert.deepStrictEqual(['a10.txt', 'A2.txt', 'A100.txt', 'a20.txt'].sort(compareFileExtensionsJavascript), ['A100.txt', 'A2.txt', 'a10.txt', 'a20.txt'], 'filenames with number and case differences sort in javascript order');
+		assert(compareFileExtensionsJavascript('aggregate.go', 'aggregate_repo.go') < 0, 'when extensions are equal, compares full filenames in javascript order');
+
+		// numeric comparisons
+		assert(compareFileExtensionsJavascript('abc2.txt', 'abc10.txt') > 0, 'filenames with numbers should be in javascript order');
+		assert(compareFileExtensionsJavascript('abc02.txt', 'abc010.txt') > 0, 'filenames with numbers that have leading zeros sort in javascript order');
+		assert(compareFileExtensionsJavascript('abc1.10.txt', 'abc1.2.txt') < 0, 'numbers with dots between them sort in javascript order');
+		assert(compareFileExtensionsJavascript('abc2.txt2', 'abc1.txt10') > 0, 'extensions with numbers should be in javascript order');
+		assert(compareFileExtensionsJavascript('txt.abc2', 'txt.abc10') > 0, 'extensions with numbers should be in javascript order even when they are multiple digits long');
+		assert(compareFileExtensionsJavascript('abc.txt01', 'abc.txt1') < 0, 'extensions with equal numbers should be in javascript order');
+		assert(compareFileExtensionsJavascript('abc02.txt', 'abc002.txt') > 0, 'filenames with equivalent numbers and leading zeros sort in javascript order');
+		assert(compareFileExtensionsJavascript('txt.abc01', 'txt.abc1') < 0, 'extensions with equivalent numbers sort in javascript order');
+		//assert(compareFileExtensionsJavascript('a.ext1', 'b.Ext1') < 0, 'if extensions with numbers are equal except for case, javascript full filenames should be compared');
+		assert(compareFileExtensionsJavascript('a.ext1', 'a.Ext1') > 0, 'if extensions with numbers are equal except for case, javascript full filenames should be compared');
 	});
 
 	ensureNoDisposablesAreLeakedInTestSuite();

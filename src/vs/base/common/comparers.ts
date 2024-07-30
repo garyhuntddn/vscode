@@ -49,6 +49,20 @@ export function compareFileNames(one: string | null, other: string | null, caseS
 	return result;
 }
 
+/** Compares full filenames using simple javascript compare. */
+export function compareFileNamesJavascript(one: string | null, other: string | null): number {
+	one = one || '';
+	other = other || '';
+
+	if (one < other) {
+		return -1;
+	}
+	if (one > other) {
+		return 1;
+	}
+	return 0;
+}
+
 /** Compares full filenames without grouping by case. */
 export function compareFileNamesDefault(one: string | null, other: string | null): number {
 	const collatorNumeric = intlFileNameCollatorNumeric.value.collator;
@@ -110,6 +124,29 @@ export function compareFileExtensions(one: string | null, other: string | null):
 	}
 
 	return result;
+}
+
+/** Compares filenames by extension, then by full filename. Uses default javascript comparison. */
+export function compareFileExtensionsJavascript(one: string | null, other: string | null): number {
+	one = one || '';
+	other = other || '';
+	const oneExtension = extractExtension(one);
+	const otherExtension = extractExtension(other);
+
+	if (oneExtension < otherExtension) {
+		return -1;
+	}
+	if (oneExtension > otherExtension) {
+		return 1;
+	}
+	if (one < other) {
+		return -1;
+	}
+	if (one > other) {
+		return 1;
+	}
+
+	return 0;
 }
 
 /** Compares filenames by extension, then by full filename. Mixes uppercase and lowercase names together. */

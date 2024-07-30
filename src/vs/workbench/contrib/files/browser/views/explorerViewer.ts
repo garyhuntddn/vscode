@@ -28,7 +28,7 @@ import { IKeyboardEvent } from 'vs/base/browser/keyboardEvent';
 import { equals, deepClone } from 'vs/base/common/objects';
 import * as path from 'vs/base/common/path';
 import { ExplorerItem, NewExplorerItem } from 'vs/workbench/contrib/files/common/explorerModel';
-import { compareFileExtensionsDefault, compareFileNamesDefault, compareFileNamesUpper, compareFileExtensionsUpper, compareFileNamesLower, compareFileExtensionsLower, compareFileNamesUnicode, compareFileExtensionsUnicode } from 'vs/base/common/comparers';
+import { compareFileExtensionsJavascript, compareFileNamesJavascript, compareFileExtensionsDefault, compareFileNamesDefault, compareFileNamesUpper, compareFileExtensionsUpper, compareFileNamesLower, compareFileExtensionsLower, compareFileNamesUnicode, compareFileExtensionsUnicode } from 'vs/base/common/comparers';
 import { CodeDataTransfers, containsDragType } from 'vs/platform/dnd/browser/dnd';
 import { fillEditorsDragData } from 'vs/workbench/browser/dnd';
 import { IInstantiationService } from 'vs/platform/instantiation/common/instantiation';
@@ -895,6 +895,10 @@ export class FileSorter implements ITreeSorter<ExplorerItem> {
 			case 'unicode':
 				compareFileNames = compareFileNamesUnicode;
 				compareFileExtensions = compareFileExtensionsUnicode;
+				break;
+			case 'javascript':
+				compareFileNames = compareFileNamesJavascript;
+				compareFileExtensions = compareFileExtensionsJavascript;
 				break;
 			default:
 				// 'default'
