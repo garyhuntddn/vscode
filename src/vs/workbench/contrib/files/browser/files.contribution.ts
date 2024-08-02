@@ -523,7 +523,7 @@ configurationRegistry.registerConfiguration({
 		},
 		'explorer.sortOrderLexicographicOptions': {
 			'type': 'string',
-			'enum': [LexicographicOptions.Default, LexicographicOptions.Upper, LexicographicOptions.Lower, LexicographicOptions.Unicode],
+			'enum': [LexicographicOptions.Default, LexicographicOptions.Upper, LexicographicOptions.Lower, LexicographicOptions.Unicode, LexicographicOptions.Javascript],
 			'default': LexicographicOptions.Default,
 			'enumDescriptions': [
 				nls.localize('sortOrderLexicographicOptions.default', 'Uppercase and lowercase names are mixed together.'),
