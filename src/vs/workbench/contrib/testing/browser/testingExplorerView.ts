@@ -1233,8 +1233,8 @@ class TreeSorter implements ITreeSorter<TestExplorerTreeElement> {
 			}
 		}
 
-		const sa = a.test.item.sortText;
-		const sb = b.test.item.sortText;
+		const sa = a.test.item.sortText || a.test.item.label;
+		const sb = b.test.item.sortText || b.test.item.label;
 		// If tests are in the same location and there's no preferred sortText,
 		// keep the extension's insertion order (#163449).
 		return inSameLocation && !sa && !sb ? 0 : (sa || a.test.item.label).localeCompare(sb || b.test.item.label);
