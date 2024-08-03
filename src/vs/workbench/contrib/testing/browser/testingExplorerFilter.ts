@@ -27,6 +27,16 @@ import { denamespaceTestTag } from 'vs/workbench/contrib/testing/common/testType
 const testFilterDescriptions: { [K in TestFilterTerm]: string } = {
 	[TestFilterTerm.Failed]: localize('testing.filters.showOnlyFailed', "Show Only Failed Tests"),
 	[TestFilterTerm.Executed]: localize('testing.filters.showOnlyExecuted', "Show Only Executed Tests"),
+	[TestFilterTerm.Passed]: localize('testing.filters.showOnlyPassed', "Show Only Passed Tests"),
+	[TestFilterTerm.Skipped]: localize('testing.filters.showOnlySkipped', "Show Only Skipped Tests"),
+	[TestFilterTerm.Errored]: localize('testing.filters.showOnlyErrored', "Show Only Errored Tests"),
+	[TestFilterTerm.Queued]: localize('testing.filters.showOnlyQueued', "Show Only Queued Tests"),
+	[TestFilterTerm.Running]: localize('testing.filters.showOnlyRunning', "Show Only Running Tests"),
+	[TestFilterTerm.NotPassed]: localize('testing.filters.showOnlyNotPassed', "Show Only Not-Passed Tests"),
+	[TestFilterTerm.NotSkipped]: localize('testing.filters.showOnlyNotSkipped', "Show Only Not-Skipped Tests"),
+	[TestFilterTerm.NotErrored]: localize('testing.filters.showOnlyNotErrored', "Show Only Not-Errored Tests"),
+	[TestFilterTerm.NotQueued]: localize('testing.filters.showOnlyNotQueued', "Show Only Not-Queued Tests"),
+	[TestFilterTerm.NotRunning]: localize('testing.filters.showOnlyNotRunning', "Show Only Not-Running Tests"),
 	[TestFilterTerm.CurrentDoc]: localize('testing.filters.currentFile', "Show in Active File Only"),
 	[TestFilterTerm.OpenedFiles]: localize('testing.filters.openedFiles', "Show in Opened Files Only"),
 	[TestFilterTerm.Hidden]: localize('testing.filters.showExcludedTests', "Show Hidden Tests"),
@@ -202,7 +212,7 @@ class FiltersDropdownMenuActionViewItem extends DropdownMenuActionViewItem {
 
 	private getActions(): IAction[] {
 		return [
-			...[TestFilterTerm.Failed, TestFilterTerm.Executed, TestFilterTerm.CurrentDoc, TestFilterTerm.OpenedFiles].map(term => ({
+			...[TestFilterTerm.Failed, TestFilterTerm.Executed, TestFilterTerm.Passed, TestFilterTerm.NotPassed, TestFilterTerm.Skipped, TestFilterTerm.NotSkipped, TestFilterTerm.Errored, TestFilterTerm.NotErrored, TestFilterTerm.Queued, TestFilterTerm.NotQueued, TestFilterTerm.Running, TestFilterTerm.NotRunning, TestFilterTerm.CurrentDoc, TestFilterTerm.OpenedFiles].map(term => ({
 				checked: this.filters.isFilteringFor(term),
 				class: undefined,
 				enabled: true,

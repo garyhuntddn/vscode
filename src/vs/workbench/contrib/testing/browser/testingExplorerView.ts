@@ -1158,6 +1158,50 @@ class TestsFilter implements ITreeFilter<TestExplorerTreeElement> {
 			return element.state !== TestResultState.Unset ? FilterResult.Include : FilterResult.Inherit;
 		}
 
+		if (!element.children || element.children.size === 0) {
+			if (this.state.isFilteringFor(TestFilterTerm.Errored) && element.state !== TestResultState.Errored) {
+				return FilterResult.Exclude;
+			}
+
+			if (this.state.isFilteringFor(TestFilterTerm.Skipped) && element.state !== TestResultState.Skipped) {
+				return FilterResult.Exclude;
+			}
+
+			if (this.state.isFilteringFor(TestFilterTerm.Passed) && element.state !== TestResultState.Passed) {
+				return FilterResult.Exclude;
+			}
+
+			if (this.state.isFilteringFor(TestFilterTerm.Queued) && element.state !== TestResultState.Queued) {
+				return FilterResult.Exclude;
+			}
+
+			if (this.state.isFilteringFor(TestFilterTerm.Running) && element.state !== TestResultState.Running) {
+				return FilterResult.Exclude;
+			}
+
+			if (this.state.isFilteringFor(TestFilterTerm.NotErrored) && element.state === TestResultState.Errored) {
+				return FilterResult.Exclude;
+			}
+
+			if (this.state.isFilteringFor(TestFilterTerm.NotSkipped) && element.state === TestResultState.Skipped) {
+				return FilterResult.Exclude;
+			}
+
+			if (this.state.isFilteringFor(TestFilterTerm.NotPassed) && element.state === TestResultState.Passed) {
+				return FilterResult.Exclude;
+			}
+
+			if (this.state.isFilteringFor(TestFilterTerm.NotQueued) && element.state === TestResultState.Queued) {
+				return FilterResult.Exclude;
+			}
+
+			if (this.state.isFilteringFor(TestFilterTerm.NotRunning) && element.state === TestResultState.Running) {
+				return FilterResult.Exclude;
+			}
+
+			return FilterResult.Include;
+		}
+
 		return FilterResult.Include;
 	}
 

@@ -196,6 +196,16 @@ export class TestExplorerFilterState extends Disposable implements ITestExplorer
 }
 
 export const enum TestFilterTerm {
+	Passed = '@passed',
+	Skipped = '@skipped',
+	Errored = '@errored',
+	Queued = '@queued',
+	Running = '@running',
+	NotPassed = '@!passed',
+	NotSkipped = '@!skipped',
+	NotErrored = '@!errored',
+	NotQueued = '@!queued',
+	NotRunning = '@!running',
 	Failed = '@failed',
 	Executed = '@executed',
 	CurrentDoc = '@doc',
@@ -204,6 +214,18 @@ export const enum TestFilterTerm {
 }
 
 const allTestFilterTerms: readonly TestFilterTerm[] = [
+	TestFilterTerm.Passed,
+	TestFilterTerm.Skipped,
+	TestFilterTerm.Errored,
+	TestFilterTerm.Queued,
+	TestFilterTerm.Running,
+
+	TestFilterTerm.NotPassed,
+	TestFilterTerm.NotSkipped,
+	TestFilterTerm.NotErrored,
+	TestFilterTerm.NotQueued,
+	TestFilterTerm.NotRunning,
+
 	TestFilterTerm.Failed,
 	TestFilterTerm.Executed,
 	TestFilterTerm.CurrentDoc,

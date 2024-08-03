@@ -33,6 +33,16 @@ suite('TestExplorerFilterState', () => {
 	const termFiltersOff = {
 		[TestFilterTerm.Failed]: false,
 		[TestFilterTerm.Executed]: false,
+		[TestFilterTerm.Errored]: false,
+		[TestFilterTerm.Skipped]: false,
+		[TestFilterTerm.Passed]: false,
+		[TestFilterTerm.Queued]: false,
+		[TestFilterTerm.Running]: false,
+		[TestFilterTerm.NotErrored]: false,
+		[TestFilterTerm.NotSkipped]: false,
+		[TestFilterTerm.NotPassed]: false,
+		[TestFilterTerm.NotQueued]: false,
+		[TestFilterTerm.NotRunning]: false,
 		[TestFilterTerm.CurrentDoc]: false,
 		[TestFilterTerm.Hidden]: false,
 	};
